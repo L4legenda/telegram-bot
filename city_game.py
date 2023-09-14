@@ -36,13 +36,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
-    if update.message.text.find("+") >= 0:
-        first, second = update.message.text.split("+")
-        first =  int(first)
-        second = int(second)
-        number_sum = first + second
-        string_sum = str(number_sum)
-        await update.message.reply_text(string_sum)
+    ...
 
 
 def main() -> None:
