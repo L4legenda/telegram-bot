@@ -3,6 +3,9 @@ import logging
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
+import g4f
+import threading
+
 import json
 
 # Enable logging
@@ -35,21 +38,27 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     await update.message.reply_text(update.message.text)
 
+def gtp_async(obj):
+    response = g4f.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": obj['message']}],
+        stream=True,
+    )
+    message = ''.join([i for i in response])
+    obj['result'] = message
+    print(message)
 
 async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
-    f = open("russian-cities.json", "r", encoding='utf-8')
-    russian_cities = f.read()
-    f.close()
-    rus_city = json.loads(russian_cities)
-    message_user = update.message.text
-    for city in rus_city:
-        name_city = city['name']
-        if name_city == message_user:
-            await update.message.reply_text("+")
-            break
-    else:
-        await update.message.reply_text("-")
+    obj = {
+        "message": update.message.text,
+        "result": ""
+    }
+    t = threading.Thread(target=gtp_async, args=(obj,))
+    t.start()
+    t.join()
+
+    await update.message.reply_text(obj['result'])
 
 def main() -> None:
     """Start the bot."""
