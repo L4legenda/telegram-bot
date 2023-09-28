@@ -60,7 +60,10 @@ async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             for city in rus_city:
                 if city['name'][0].lower() == last_char.lower():
                     all_city_last_char.append(city['name'])
-            random_city = random.choice(all_city_last_char)
+            for i in range(100):
+                random_city = random.choice(all_city_last_char)
+                if random_city not in usedCities:
+                    break
             usedCities.append(random_city.lower())
             await update.message.reply_text(random_city)
             break
