@@ -5,6 +5,8 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 
 import json
 
+import random
+
 # Enable logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -35,18 +37,32 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     await update.message.reply_text(update.message.text)
 
+usedCities = []
 
 async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
+    global usedCities
     f = open("russian-cities.json", "r", encoding='utf-8')
     russian_cities = f.read()
     f.close()
     rus_city = json.loads(russian_cities)
     message_user = update.message.text
+
     for city in rus_city:
         name_city = city['name']
-        if name_city == message_user:
-            await update.message.reply_text("+")
+        if name_city.lower() == message_user.lower():
+            if message_user.lower() in usedCities:
+                await update.message.reply_text("Город уже был")
+                break
+            usedCities.append(message_user.lower())
+            last_char = message_user[-1]
+            all_city_last_char = []
+            for city in rus_city:
+                if city['name'][0].lower() == last_char.lower():
+                    all_city_last_char.append(city['name'])
+            random_city = random.choice(all_city_last_char)
+            usedCities.append(random_city.lower())
+            await update.message.reply_text(random_city)
             break
     else:
         await update.message.reply_text("-")
