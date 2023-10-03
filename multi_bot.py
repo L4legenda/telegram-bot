@@ -3,10 +3,9 @@ import logging
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
-import g4f
-import threading
-
 import json
+
+import random
 
 # Enable logging
 logging.basicConfig(
@@ -38,13 +37,22 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     await update.message.reply_text(update.message.text)
 
-"""
-Бот для получения новостей и статей на определенную тему.
-Бот для изучения иностранных языков с помощью упражнений и тестов.
-Бот для игр и развлечений, например, квизов или головоломок.
-Бот-медитация, который будет предоставлять пользователю аудиозаписи с медитациями и упражнениями для расслабления.
-Бот-календарь, который будет помогать пользователю планировать свое время и создавать события.
-"""
+multi = ""
+
+async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    global multi
+    if multi == "bot_ai":
+        bot_ai(update, context)
+    if multi == "bot_city":
+        bot_city(update, context)
+    if update.message.text == "Презентация":
+        multi = "bot_ai"
+    if update.message.text == "Города":
+        multi = "bot_city"
+
+
+async def bot_city(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Echo the user message."""
 
 def gtp_async(obj):
     response = g4f.ChatCompletion.create(
@@ -59,7 +67,7 @@ def gtp_async(obj):
     obj['result'] = message
     print(message)
 
-async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def bot_ai(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     obj = {
         "message": update.message.text,
